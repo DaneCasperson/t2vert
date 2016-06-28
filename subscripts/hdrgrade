@@ -26,7 +26,22 @@ for folder in $(ls -v -d $dumpedframes/*/)
 
 				# process images with luminance hdr (hard baked in right now is the mantiuk06 operator
 				# but we could make this an option later
-				luminance-hdr-cli -t $tonemapoperator -o $gradedframes/$newfolder/$number.png -q 100 $folder/$image
+				
+				# collects tone mapping operater values from
+				# a settings file.  we store them in variables
+				# that we will use with luminance hdr in the 
+				# next couple of lines
+
+				settings=../$(ls ../ | grep -i .txt)
+
+				toneoperator=$(cat $settings | grep -i TMO= | sed -e s/.*=//g)
+				contrastfactor=$(cat $settings | grep -i contrastfactor | sed -e s/.*=//g)
+				saturationfactor=$(cat $settings | grep -i saturationfactor | sed -e s/.*=//g)
+				detailfactor=$(cat $settings | grep -i detailfactor | sed -e s/.*=//g)
+				contrastequalization=$(cat $settings | grep -i contrastequalization | sed -e s/.*=//g)
+				pregamma=$(cat $settings | grep -i pregamma | sed -e s/.*=//g)
+
+				luminance-hdr-cli --ev 0 -t $tonemapoperator -p contrast=$contrastfactor:saturation=$saturationfactor:detail=$detailfactor:equalization=$contrastequalization --gamma $pregamma -o $gradedframes/$newfolder/$number.png -q 100 $folder/$image
 		
 				# incriments number variable so that images get new names on export from luminance hdr
 				number=$(($number+1))
