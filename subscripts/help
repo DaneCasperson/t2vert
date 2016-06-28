@@ -79,6 +79,9 @@ You can change the scripts behavor by providing some options
 	generated frames, this solution can sometimes mask errors in the optical flow
 	video, while preserving some of the smoother motion that the optical flow intepretation
 	provides.
+	
+	-r 
+	grade video using luminance hdr
 
 
 	
