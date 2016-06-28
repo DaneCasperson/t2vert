@@ -1,0 +1,275 @@
+#!/bin/bash
+
+##################################################
+################# the variables ##################
+##################################################
+
+# sets base state of our command line options by creating variables that
+# default to our prefered state. This is how the script will behave
+# if no options are given
+
+dumpframes=false
+darktable=false
+opticalflow=false
+encodeopticalflow=false
+encodeduplicatedframevideo=false
+encodeblendedvideo=false
+grade=false
+hdrgrade=false
+
+scripthelp=true
+
+
+# takes the current working directory, and make a variable that reflects that
+currentdirectory=$(pwd)
+
+
+# this should point to where all the other subscripts are, for dumping frames
+# and processing things with dark table, most likely in the subscripts directory
+scriptfolder=subscripts
+
+
+
+# -a perform all the operations in the script
+# -d dump dng images out of mlv files
+# -g grade the clips, color grade the images
+# -h help, display the help file
+# -o optical flow frame generation using slowmotionvideo
+# -r use luminance hdr to process photos
+
+
+while getopts ":dhgaoefbqicr" opt
+
+do
+
+	case $opt in
+		
+		# does everything, dumps frames, color grades, synthesises
+		# frames with slowmotionvideo and creates a final video with
+		# ffmpeg (most likely a prores file)
+		a)
+		dumpframes=true
+		darktable=true
+		opticalflow=true
+		encodeopticalflow=true
+		encodeduplicatedframevideo=true
+		scripthelp=false
+		encodeblendedvideo=true
+		>&2
+		;;
+		# this will open up dark table so that you can create a grade you like
+		# for the images you are about to process.
+		c)
+		dumpframes=false
+                darktable=false
+                opticalflow=false
+                encodeopticalflow=false
+                encodeduplicatedframevideo=false
+                scripthelp=false
+                encodeblendedvideo=false
+		grade=true
+		>&2
+		;;
+		# use luminannce hdr to color grade your images.
+		r)
+		hdrgrade=true
+		darktable=false
+		scripthelp=false
+		>&2
+		;;
+		# stands for quick encode, honestly, this has produced the best reasults
+		# in most cases, although the motion is not as smooth as the motion
+		# from optical flow created frames, it is artifact free everytime.
+		# this command dumps the frames, processes them with darktable, and encodes
+		# a frame skipped video with ffmpeg, can work even on machines without
+		# fast graphics cards
+		q)
+		dumpframes=true
+		darktable=true
+		encodeduplicatedframevideo=true
+		scripthelp=false
+		>&2
+		;;
+		# dumps frames from mlv files
+		d)
+		dumpframes=true
+		scripthelp=false
+		 >&2
+		;;
+		# color grades images into beautiful png image sequences
+		g)
+		darktable=true
+		scripthelp=false		
+		>&2
+		;;
+		# generates frames using optical flow
+		o)
+		opticalflow=true
+		scripthelp=false
+		>&2
+		;;
+		# sets help variable to true, so that a help screen
+		# can be echoed back to the user
+		h)
+		scripthelp=true
+		dumpframes=false
+		opticalflow=false
+		darktable=false
+		>&2
+		;;
+		# encode optical flow frames to video file
+		e)
+		scripthelp=false
+		encodeopticalflow=true
+		>&2
+		;;	
+		b)
+		# mixes the optical flow video, and the blended frames
+		# video together, helpful for masking artifacting caused
+		# in some scenes by the optical flow not quite getting
+		# it right.
+		scripthelp=false
+		encodeblendedvideo=true	
+		>&2
+		;;
+		# encodes frame duplicated videos, simple, and fast, works even on slow
+		# machines rather well, skipping the optical flow process entirely
+		# motion will be less smooth, but no fear of artifacting. this step is
+		# needed if you intend to use the final output, which is where I tend to
+		# go, IE a mix of optical flow and frame blending to create a healthy
+		# compramise between the smooth motion of optical flow, and the artifact
+		# free nature of pure frame blending.
+		f)
+		scripthelp=false
+		encodeduplicatedframevideo=true
+		>&2
+		;;
+		# informs the user if a provided argument is invalid
+		\?)
+		echo "invalid argument -$OPTARG" >&2
+		;;
+	
+	esac
+
+done
+
+
+###############################################################
+############### the color grading process #####################
+###############################################################
+
+# opens up darktable so that we can decide on a look
+# for our images, the careful process of color grading
+# takes place before our cold machine does the batch processing
+
+if [ $grade == true ]
+	then	
+	cd $currentdirectory/subscripts/
+	./grade
+fi
+
+
+
+###########################################################
+################# the help screen #########################
+###########################################################
+
+# displays a help screen, if the help screen variable is true
+# this will be the case if the user invoked the -h option
+
+if [ $scripthelp == true ]
+	then
+	cd $currentdirectory/$scriptfolder
+	less help
+fi
+
+
+##########################################################
+################## dump frames ###########################
+##########################################################
+
+# this will dump frames if the dumpframes variable is set to true
+# depending on the user supplied options, this might be the first
+# thing that gets run before a whole slew of other things, or it
+# might be the only thing that gets run. 
+
+if [ $dumpframes == true ]
+	then
+		cd $currentdirectory/$scriptfolder
+		./dumpframes
+fi
+	 
+
+############################################################
+###################### color grade images ##################
+############################################################
+
+# opens the darkgrade script, and runs it, this scripts
+# color grades all the images that it finds that dumpframes unpacked
+
+if  [ $darktable == true ]
+	then
+		cd $currentdirectory/$scriptfolder
+		./darkgrade
+fi
+
+
+# the second option for color grading videos, using luminance hdr instead
+# of dark table
+
+if [ $hdrgrade == true ]
+	then
+		cd $currentdirectory/$scriptfolder
+		./hdrgrade
+fi
+
+
+
+
+###############################################################
+################# optical flow frame generation ###############
+###############################################################
+
+
+if [ $opticalflow == true ]
+	then
+		cd $currentdirectory/$scriptfolder
+		./opticalflow
+fi
+
+
+##################################################################
+#encode video that extrapilates motion with simple frame blending#
+##################################################################
+if [ $encodeduplicatedframevideo == true ]
+	then
+		cd $currentdirectory/$scriptfolder
+		./encode-frame-blended-video
+fi
+####################################################################
+######### encode the optical flow synthesised frames ###############
+####################################################################
+
+if [ $encodeopticalflow == true ]
+	then
+		
+		cd $currentdirectory/$scriptfolder
+		./encode-optical-flow-video
+fi
+
+#####################################################################
+##################### encode final video ############################
+#####################################################################
+
+# the final video is one created by mixing the videos encoded with 
+# optical flow, and the ones encoded with frame blending to create
+# a healthy mix of silky smooth optical flow frames, with the 
+# artifact free frame blending. you end up with smooth video, that
+# has acceptable levels of artifacts that resemble compression artifacts
+# more then optical flow heavyweight distortions
+if [ $encodeblendedvideo == true ]
+	then
+		cd $currentdirectory/$scriptfolder
+		./mix-video
+fi
+
