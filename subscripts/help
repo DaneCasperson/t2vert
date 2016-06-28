@@ -52,7 +52,7 @@ You can change the scripts behavor by providing some options
 	display this help screen
 
 	-g 
-	color grade images
+	dont do this right now
 
 	-a 
 	dumps images, color grades them, generates missing frames with
@@ -67,7 +67,7 @@ You can change the scripts behavor by providing some options
 	artifacts
 	
 	-e 
-	encodes video at 24fps with the frames we generated using optical flow.
+	encodes video at 24fps with the frames we generated using optical flow. 
 
 	-f
 	encodes a frame duplicated video directly from the png files we graded with
