@@ -52,7 +52,9 @@ You can change the scripts behavor by providing some options
 	display this help screen
 
 	-g 
-	dont do this right now
+	converts raw images to PNG files using darktable
+	this will apply any settings provided in a .xmp file
+	of the same directory as the t2vert script
 
 	-a 
 	dumps images, color grades them, generates missing frames with
