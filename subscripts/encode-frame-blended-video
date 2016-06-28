@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# imports variables from the configuration file
+source ./configuration-file
+
+# name of exported video files
+videofile=1
+
+# creates directory to put video files into
+mkdir $noneopticalvideo
+
+for folder in $(ls $gradedframes)
+
+	do
+
+	# names out audio file, so we can parse it with ffmpeg (by parsing this variable)
+	# and encode it into our video
+	audiofile=$(ls $gradedframes/$folder | grep -i .wav)
+
+	
+
+		if [ -a $gradedframes/$folder/*.wav ]
+
+			then
+
+				ffmpeg -r 18 -i $gradedframes/$folder/%d.png -i $gradedframes/$folder/$audiofile -vcodec prores -r 24 $noneopticalvideo/$videofile.mov
+                                                                                                 
+				else
+                                                                                                
+				ffmpeg -r 18 -i $gradedframes/$folder/%d.png -vcodec prores -r 24 $noneopticalvideo/$videofile.mov
+
+
+# I am keeping this little line of code around, because it could be used in the future to have ffmpeg do frame blending which I think
+# could in turn be blended with the optical flow video, and create a smoother motion, for now this frame blending
+# thing seems to be broken, I think its an issue with ffmpeg, as it works on some systems, and fails on others
+#ffmpeg -r 18 -i $gradedframes/$folder/%d.png -vcodec prores -vf framerate=fps=24:scene=1 -y $noneopticalvideo/$videofile.mov
+
+		fi
+	
+	#preps to name the next video file something different from the last one
+	videofile=$(($videofile+1))
+
+	done

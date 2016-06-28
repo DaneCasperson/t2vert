@@ -1,0 +1,74 @@
+#!/bin/bash
+
+
+############################################
+############## variables ###################
+############################################
+
+
+# grabs our base variables from our config file
+source ./configuration-file
+
+
+
+# sets some local variables
+
+newfolder=1
+
+# creates the directory we will be placing color graded images into
+mkdir $gradedframes
+
+for folder in $(ls -v -d $dumpedframes/*/)
+	do
+
+		# sets the number variable, darktable will use this
+		# to name the images it outputs
+		number=1
+		
+		echo $folder
+
+		# does some basic clean up, removing any xmp
+		# files that may have ended up in the same
+		# folder as our dng images sequences
+		
+		for xmp in $(ls $folder | grep -i .xmp)
+			do
+				rm $(echo $folder)$xmp
+			done
+		
+		# creates the directories we will be dumping the new
+		# color graded frames into
+		mkdir $gradedframes/$newfolder
+
+		# does the color grading of the images. we use
+		# dark table for this
+
+		# a note, the $xmpfile we reference here, is defined
+		# in the config script that we called earlier or "imported"
+		# earlier
+		
+		for image in $(ls -v $folder | grep -i .dng)
+			do
+				# runs darktable-cli and turns the image
+				# into dng image sequences, all put in
+				# our dng image sequence folder
+
+				darktable-cli $(echo $(echo $folder)$image) $xmpfile $(echo $gradedframes/$newfolder/$number).png
+
+				# increments our number variable, this
+				# happens for every frame darktable processes
+				# so that darktable can name the next frame it
+				# saves based on this variable
+				number=$(($number+1))
+			done 
+
+		# copies audio files (if any) to the png image
+		# sequence folders
+
+		cp $folder/*.wav $gradedframes/$newfolder/
+
+		# incriments the variable that defines where darktable
+		# and our audio copy script, place there files when there
+		# done with them.
+		newfolder=$(($newfolder+1))
+	done

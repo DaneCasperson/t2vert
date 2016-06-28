@@ -1,0 +1,201 @@
+#!/bin/bash
+
+# calls variables from the configuration file. This contains variables
+# that are shared across a lot of these sub scripts
+source ./configuration-file
+
+#creates the mixed frames sequences folder, we will store all the completely
+# rendered image sequences in this folder
+mkdir $mixedframesequences
+
+# defines variable for new folder to store the synthesised		
+# and original frames in. IE mixed frames of new and old
+mixedframesfolder=1
+
+echo $gradedframes
+
+# the big forloop, we scan the directory with our color graded png
+# image sequences and generates synthesised frames to bring the framerate
+# up to 24 frames a second smoothly
+for imagedirectory in $(ls $gradedframes/)
+	do
+
+		# creates the working directory that we will be playing with
+		# we will remove it at the end as well
+
+		mkdir $workingdirectory
+
+
+		# defining the variables we will be using to individually
+		# generate a couple of extra frames to bring our
+		# frame rate up to 24 frames a second
+
+		frametwo=2
+		framethree=3
+
+		# will be the place slowmoRenderer looks to find its images
+		# to generate new frames from
+		retimedirectory=$workingdirectory/retimedirectory
+
+		#directory where slomovideo dumps the frames it makes
+		slowmoframes=slowmoframes
+
+		# the name of a video that slowmo video needs in order to
+		# process and generate extra frames. Basically i tried using
+		# images as input to slowmovideo, but i cant figure out the
+		# proper way of telling slowmotionvideo to use images, so I
+		# did a workaround of encoding frames into a video file, and 
+		# then pointing slowmotion video at the video file. at which
+		# point it rips frames out of the video and generates our extra
+		# frames.  This is the variable we will use to name, and reference
+		# said video file
+		sourceframes=sourceframes
+
+		# we are only generating a new frame for every 3rd image, so we
+		# dont need to the for loop to run for every single image in the
+		# each directory, we only need it to run for every third image
+		# this takes the number of images in the directory were currently
+		# looking at and devides it down so we only run the for loop as many
+		# times as we need to in order to synthesise our extra needed frames
+		numberoffiles=$(ls -1 $gradedframes/$imagedirectory/ | grep -i .png | wc -l)
+
+
+		# bake the ffmpeg convert images in the folder $retimedirectory command
+		# into a variable for easier access later.  I talked in length about why
+		# we need to bake frames into a video file up at the sourceframes variable
+		# as a note, I think this step could be whats causing the flickering, so if
+		# we can figure out how to feed images into slowmotion video directly
+		# it may stop the flickering, either way it would speed the script up
+		# and provide a higher quality reasult
+		makemovie="ffmpeg -i $retimedirectory/%d.png -vcodec prores $workingdirectory/sourceframes.mov"
+
+		# baking the command to make a frame with slowoRenderer into a variable for
+		# easy repeat usage in the scrip
+		createframe="slowmoRenderer -input video $workingdirectory/sourceframes.mov -interpolation twoway -size orig -v3dLambda 1 -target images %04d.png $workingdirectory/$slowmoframes -slowfactor 0.5"
+
+
+		# This is the variable that we use in our for loop, to process every third image.
+		# its here just so we only run the for loop as many times as we need to, and
+		# not anymore times then we need
+		end=$(echo $(($numberoffiles / 3)))
+
+
+		# we use these variables to space out the image names so we can insert
+		# the new optical flow generated frames into the series of images
+		# at the correct points
+		fileone=1
+		filetwo=2
+		newframe=3
+		filethree=4
+		incriment=4
+		oldfileone=1
+		oldfiletwo=2
+		oldfilethree=3
+
+		# defines the directory that we will be placing frames for later conversion
+		# into a video and for temp storage of the optical flow generated frames 
+		newdirectory=$workingdirectory/newdirectory
+		synthframes=$workingdirectory/synthframes
+
+		#######################################################################
+		###################### the code to generate the frames ################
+		#######################################################################
+
+		
+		# creates a sub frame between the second and third image for every second
+		# of video. so for the first second it makes a sub frame between frames
+		# 2 and 3 and then adds three to the numbers to make the next subframe
+		# and so on and so on
+
+
+		for images in $(seq $end)
+		
+			do
+
+				# creates the directories we will be storing files in for a short
+				# time, they will be purged directly after this script completes
+				mkdir $newdirectory
+				mkdir $retimedirectory
+				mkdir $synthframes
+		
+				# copies frames over, a very specific set of frames, so we can synthesise
+				# a new one around every 3rd frame
+				cp $gradedframes/$imagedirectory/$oldfileone.png $newdirectory/$fileone.png
+				cp $gradedframes/$imagedirectory/$oldfiletwo.png $newdirectory/$filetwo.png
+				cp $gradedframes/$imagedirectory/$oldfilethree.png $newdirectory/$filethree.png
+				
+				cp $gradedframes/$imagedirectory/$frametwo.png $retimedirectory/1.png
+				cp $gradedframes/$imagedirectory/$framethree.png $retimedirectory/2.png
+
+				# remember those "quick commands" we made earlier by baking some commands
+				# into a variable, we are employing them now to generate a video, and to
+				# render frames from that video
+				$makemovie
+				$createframe
+
+
+				mv $workingdirectory/$slowmoframes/rendered-00002.jpg $synthframes/$(echo $(echo $newframe).jpg)
+
+				# cleans up the directories for next go through the for loop
+				rm -r $workingdirectory/$slowmoframes
+				rm -r $retimedirectory
+				rm $workingdirectory/sourceframes.mov
+
+				# incriments this mess of variables for each go through
+				# the for loop
+				frametwo=$(($frametwo+3))
+				framethree=$(($framethree+3))
+	
+				fileone=$(($fileone+$incriment))	
+				filetwo=$(($filetwo+$incriment))
+				filethree=$(($filethree+$incriment))	
+				newframe=$(($newframe+$incriment))
+
+				oldfileone=$(($oldfileone+3))
+				oldfiletwo=$(($oldfiletwo+3))
+				oldfilethree=$(($oldfilethree+3))
+
+				# after this for loop there should be two folders around if you stopped the
+				# script now one will contain the original video files, they will be named
+				# in odd increminents like 1 2 4 5 6 7 9 10 12 13 and so on.  the other will
+				# have synthesised frames, they will be named 3 6 8 11 14 and so on. were gonna
+				# merge the two folders in the next section
+			done
+
+
+		# converts the jpg images generated by slowmoRenderer into png images, and
+		# places them inside the folder we have incrimented the original frames into.
+		# we left spaces for the new frames in the numbering system so they fit in
+		# real easy like
+
+		for image in $(ls -v $synthframes)
+	
+			do
+	
+				convert $synthframes/$image $( echo ./$newdirectory/$image | sed s/jpg/png/g)
+
+			done
+
+		# copies the audio file from the color graded png image sequence folder
+		# to the new mixed frames folder, to keep the camera audio with the
+		# video frames
+		cp $dumpedframes/$image/*.wav $mixedframesequences/$mixedframesfolder/ 
+
+		# creates directory to store the mixed frames
+		#mkdir $mixedframesequences/$mixedframesfolder/
+
+		# moves the images into the new mixed frames folder
+		mv $newdirectory $mixedframesequences/$mixedframesfolder
+
+		echo $newdirectory
+		echo $mixedframessequences
+
+		# increment the mixedframesfolder for the next loop of frame 
+		# synthesis
+		mixedframesfolder=$(($mixedframesfolder+1))
+
+		#clean up
+		#remove working directory
+		rm -r $workingdirectory
+
+	done

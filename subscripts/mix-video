@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# we can mix blended frames and optical flow frames to reduce the noticability of any
+# artifacting caused by the optical flow. it should also reduce flicker, hopefuly all
+# the while retiaining a smoother motion. clearly there is a cost here but it
+# might be small enough to be worth it.
+
+
+# as per usual, import our settings
+source ./configuration-file
+
+
+# create the directory we will dump videos into
+mkdir $blendedvideo
+
+# name of output videos
+number=1
+
+# ffmpeg base code
+# ffmpeg -i ../optical-flow-video/1.mov -i ../none-optical-flow-video/1.mov -filter_complex "[1:v][0:v] blend=all_mode='average'" -vcodec prores tst.mov
+
+for video in $(ls $noneopticalvideo)
+	
+	do
+	
+		ffmpeg -i $noneopticalvideo/$video -i $opticalflowvideo/$video -filter_complex "[1:v][0:v] blend=all_mode='average'" -vcodec prores $blendedvideo/$number.mov
+				
+		# name the video something different next time
+		number=$(($number+1))
+
+	done
