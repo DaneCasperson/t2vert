@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#input frame rate, put how many frames a second you shot your footage at here
+inputframerate=24
+
 # this is the variable that defines what operator luminance hdr will use
 # to tone map images
 

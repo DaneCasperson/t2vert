@@ -23,11 +23,11 @@ for folder in $(ls $gradedframes)
 
 			then
 
-				ffmpeg -r 18 -i $gradedframes/$folder/%d.png -i $gradedframes/$folder/$audiofile -vcodec prores -r 24 $noneopticalvideo/$videofile.mov
+				ffmpeg -r $inputframerate -i $gradedframes/$folder/%d.png -i $gradedframes/$folder/$audiofile -vcodec prores -r 24 $noneopticalvideo/$videofile.mov
                                                                                                  
 				else
                                                                                                 
-				ffmpeg -r 18 -i $gradedframes/$folder/%d.png -vcodec prores -r 24 $noneopticalvideo/$videofile.mov
+				ffmpeg -r $inputframerate -i $gradedframes/$folder/%d.png -vcodec prores -r 24 $noneopticalvideo/$videofile.mov
 
 
 # I am keeping this little line of code around, because it could be used in the future to have ffmpeg do frame blending which I think
