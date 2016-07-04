@@ -15,12 +15,13 @@ for folder in $(ls -v -d $dumpedframes/*/)
 		# the images it outputs
 		number=1
 
+
 		# creates directory we will dump the name frames
 		# into
 
 		mkdir $gradedframes/$newfolder
 			
-			for image in $(ls -v $folder | grep -i .dng)
+			for image in $(ls -v $folder | grep -i .dng | grep -v .xmp )
 				
 				do
 
