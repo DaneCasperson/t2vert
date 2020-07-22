@@ -1,0 +1,114 @@
+#!/bin/bash
+
+
+# This is a script to open up darktable, for the creation of a new xmp file to grade
+# if an xmp file is already present in the same folder, it will use that, if not, it
+# will let you start from scratch.
+
+#This section adds a diolog box that the user can enter the frame number that they wish
+#to use as a reference for color grading
+number="$(
+	 zenity --entry \
+		--title="define preview frame to grade" \
+		--text="frame number" \
+		--entry-text "50"
+
+)"
+
+
+#A series of variables to store the number the user entered for the
+#frame to use as a reference for color grading
+storednumber=$number
+
+#The frame we will grab to use for our color grading preview
+frame=1
+frame=$(($frame + $storednumber))
+frame="$(printf "%05d" $frame)"
+echo "$frame"
+
+
+#imports variables from config file
+source ./configuration-file
+
+# creates a temperary directory to work in
+mkdir $rootdirectory/grade
+
+
+# this little section looks to see if there is an xmp file in your
+# root directory already, if there is it takes note of that
+xmpfile=$(ls $rootdirectory/ | grep -i .xmp)
+echo $xmpfile
+
+# this copies that xmp file over to a little folder known as the grade folder
+# a temp folder where we can do our grading, and then when were done, it will
+# be as though it never existed
+cp $rootdirectory/$xmpfile ../grade/grade.dng.xmp
+
+# looks to see if you have any dng files dumped yet, if you do, it copies one of them
+# over to a temp folder so you can work on a color grade, and opens up dark table.
+if [ -a $dumpedframes/1/1_frame_$frame.dng ]
+	
+	then
+		cp $dumpedframes/1/1_frame_$frame.dng $rootdirectory/grade/grade.dng
+	
+
+
+		# here we open up dark table, to color grade some images with
+		# also note some of the extra bits of code we added.
+		# we use the --library option set to memory so that darktable 
+		# will use our xmp files as the definition for the image, instead 
+		# of its own internal database
+		darktable --library ":memory:" $rootdirectory/grade 
+
+
+	else
+
+	
+		# this bit of code finds a single mlv file in the root directory
+		# so that we can export a couple of dng frames from that file
+		mlvfile=($(ls $rootdirectory | grep -i .mlv ))
+
+		#copies mlv dump to our root directory to dump a sample frame to work on a grade for
+		cp mlv_dump.linux $rootdirectory/mlv_dump.linux
+
+		# moves us into our root directory
+		cd $rootdirectory
+
+		# uses mlv dump to get a frame that we can use to base our color grade
+		# off of	
+		./mlv_dump.linux --dng -f $frame-$frame $mlvfile #mlv dump only dumps frame 50, if it does not exist, this part of the code will fail
+		
+		# moves the newly extracted frame to our temp directory
+		mv *.dng ./grade/grade.dng
+		
+		# we return to our homeland in the subscripts directory
+		# we had to move up earlier but now that we dont need to
+		# be in the root directory I prefer to operate from here
+		cd $subscriptsdirectory
+	
+		# here we open up dark table, to color grade some images with
+		# also note some of the extra bits of code we added.
+		# we use the --library option set to memory so that darktable 
+		# will use our xmp files as the definition for the image, instead 
+		# of its own internal database
+		darktable --library ":memory:" $rootdirectory/grade 
+fi
+
+
+# we move into this folder just as a safety precaution since were about to delete stuff
+cd $subscriptsdirectory
+
+# creates a directory to dump old xmp files in, this is just incase you did not want to delete them
+mkdir ./trash
+
+# moves the old xmp file into our newly created trash bin. just in case you did not want to delete it.
+mv $rootdirectory/*.xmp ./trash
+
+# takes the xmp file you just creates (or fine tuned) and moves it back into the main folder
+# where the script can reference it later.
+mv $rootdirectory/grade/*.xmp $rootdirectory/quickgrade.xmp
+
+# removes our temp working directory
+rm -r $rootdirectory/grade
+
+

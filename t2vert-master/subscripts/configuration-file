@@ -1,0 +1,58 @@
+#!/bin/bash
+
+#input frame rate, put how many frames a second you shot your footage at here
+inputframerate=24
+
+#how many frames a second is the source video?
+outputframerate=24
+
+# this is the variable that defines what operator luminance hdr will use
+# to tone map images
+
+tonemapoperator=mantiuk06
+
+# this is a bash script that exists simply to set envriment
+# variables for all the scripts that make up our master
+# script. 
+
+rootdirectory=..
+
+# directory where all of these subscripts are stored
+subscriptsdirectory=./subscripts
+
+# directory where we store all of our dng image sequences, to keep
+# things clean. and so we can have a seperate folder with color graded
+# png image sequences later on
+
+dumpedframes=$rootdirectory/dng-sequences
+
+# folder where we are going to place all of our png image sequences
+
+gradedframes=$rootdirectory/png-sequences
+
+
+# location where the mixed frames of synthesised frames and original frames
+# will be stored.
+mixedframesequences=$rootdirectory/mixedframes
+
+# location where we store the none optical flow video frames that were created by
+# blending two frames together
+noneopticalvideo=$rootdirectory/none-optical-flow-video
+
+#location of optical flow generated video files
+pvideo=$rootdirectory/prores-vids
+
+#location for mixed two videos together into one, to blend the blended frames and the
+# the optical flow frames to "hide" optical flow distortions, while preserving
+# there motion smoothing effect
+blendedvideo=$rootdirectory/blended-video
+
+
+workingdirectory=./workingdirectory
+
+# to colorgrade our images, we open darktable, and color grade a single
+# image, this will generate an xmp file of the same name. we take this xmp
+# file and use it to color grade all the images we process in this script
+# this variable defines where that xmp file is located
+
+xmpfile=$rootdirectory/$(ls $rootdirectory | grep -i .xmp)

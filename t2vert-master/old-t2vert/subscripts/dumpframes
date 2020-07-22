@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# this script simply dumps all the frames from the mlvfiles off your
+# camera into there own folders, it uses the magic lantern script mlv_dump
+# to do the heavy lifting
+
+
+
+##############################################
+########### the variables ####################
+##############################################
+
+# grabs variables from our config file
+source ./configuration-file
+
+
+
+
+####################################################
+################## dump mlv to frames ##############
+####################################################
+
+
+# decompresses all .mlv files into .dng files
+# and moves the batches of .dng files to there 
+# own seperate folders. we use the magic lantern
+# script mlv_dump to "unpack" the .mlv files
+
+# sets the dngfolder variable to 1, it will incriment later for every
+# mlv file present in the $rootdirectory
+dngfolder=1
+
+#creates directory to place dng sequence folders into
+mkdir $dumpedframes
+
+for mlv in $(ls -v $rootdirectory | grep -i .mlv)
+
+        do
+        
+        # make directory to place .dng files into upon extraction
+        mkdir $dumpedframes/$dngfolder
+        
+        #extract dng files
+        ./mlv_dump.linux --dng $rootdirectory/$mlv
+
+        mv $rootdirectory/*.dng $dumpedframes/$dngfolder
+        mv $rootdirectory/*.wav $dumpedframes/$dngfolder
+        
+        #prep variable for next set of dng images
+        dngfolder=$(($dngfolder+1))
+
+        done	
+
+

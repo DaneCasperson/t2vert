@@ -1,0 +1,91 @@
+it should be noted that this file has not been updated in awhile, if people start using this script
+I might update this to reflect the most recent changes to the scripts usage, but since it seems
+I am currently the only guy using it, it does not seem worth the time. be aware most of the flags are
+accurate, but some of the text in regards to default frame rates and the like is outdated and no longer
+reflective of the exact workings of this program
+
+if in doubt on how to use this, please visit the magic lantern forums, I have created a video
+tutorial to explain basic usage. it would be advisable that you watch it.
+
+About this Script
+
+This script is designed to make it possible to shoot raw video on the
+canon T2i (and similar cameras that are limited by a small buffer and slow sd
+card write speeds) by providing a functional workflow to color grade large
+numbers of videos, and to use optical flow to generate in between frames
+so that the user can record video at higher resolutions by dropping the 
+framerate on the camera to 18 frames a second
+
+Some important usage notes:  The original video must be recorded at 18 frames
+a second, no more no less.  It is advised that the user use the settings of
+18 frames a second on the camera, and a resolution of 1280 by 480.
+This is the highest stable resolution I have been able to achieve on the t2i. 
+for best reasults, use the fastest shutter possible as to minimize confusion
+for the optical flow programs
+
+About this script itself:  the script dumps frames from .mlv files and sorts
+them into folders. it then color grades these images based on a user provided
+xmp file (generate this with darktable) from there it uses optical flow
+to create new frames in order to bring the video framerate up to 24 frames
+a second with smooth fluid motion. (most of the time, optical flow can be
+a hit or miss kind of thing, the less motion blur there is, the more likely
+optical flow will succeed)
+
+You can change the scripts behavor by providing some options
+
+	-c
+	color grade your clips. This opens up darktable, so that you can create a look
+	that will be applied to all of your images. what this does is on the backend is 
+	create a new xmp file and place it in the same directory as your videos, 
+	from which point the script will use that xmp file as the color grade for all 
+	the images. if you do not place an xmp file in the directory with your videos, 
+	(IE run this step first) the darktable defaults will be used
+
+	-q
+	quick encode, dumps the frames from the MLV containers, color grades them
+	and then encodes them into video files. Best solution as of this writing, some of
+	the other solutions are more expiremental
+
+	-d
+	dump frames from mlv file and do nothing else
+
+	-h
+	display this help screen
+
+	-g 
+	converts raw images to PNG files using darktable
+	this will apply any settings provided in a .xmp file
+	of the same directory as the t2vert script
+
+	-a 
+	dumps images, color grades them, generates missing frames with
+	opticalflow, and finaly exports a prores file for your editing 
+	pleasure. IE this stands for all, it does it all 
+
+	-o 
+	optical flow.  generate extra frames using the program slowmotion video.	
+	this program employs optical flow to figure out what the frames that do
+	not exist might have looked like. and from there it creates them. if this
+	solution works, it produces the best reasults, if it fails, it creates horrible
+	artifacts
+	
+	-e 
+	encodes video at 24fps with the frames we generated using optical flow. 
+
+	-f
+	encodes a frame duplicated video directly from the png files we graded with
+	darktable. IE no optical flow, just simple quick frame duplication to bring
+	the framerate up to 24 frames a second.
+
+	-b
+	Encode frames that are blended between the duplicated frames, and the optical
+	generated frames, this solution can sometimes mask errors in the optical flow
+	video, while preserving some of the smoother motion that the optical flow intepretation
+	provides.
+	
+	-r 
+	grade video using luminance hdr
+
+
+	
+	

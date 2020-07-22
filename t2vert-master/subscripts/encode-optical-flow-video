@@ -1,0 +1,42 @@
+#!/bin/bash
+
+
+# this is a small sub script that uses ffmpeg to turn
+# the frames we have previesly rendered into a video
+# file.  it will produce a pro-res video file for editing
+
+source ./configuration-file
+
+mkdir $pvideo
+
+# this variable represents the folders contained within the mixedframes folder
+# that we plan to encode into video files
+number=1
+
+
+# this for loop traverses to the mixedframes directory, and then encodes
+# any .dng files that are contained within the folders within (folders are
+# presumed to be named sequentially. script may fail if they are not)
+for folder in $(ls $gradedframes)
+	
+	do	
+		# looks to see if there is an audio file inside the folder with
+		# the images, if there is, then it encodes the video with audio
+		# if there is not, then it encodes the video without audio
+		if [ -a $gradedframes/$number/*.wav ]
+
+			then
+	
+				ffmpeg -r 24 -i $gradedframes/$number/%d.png -i $gradedframes/$number/*.wav -vcodec prores $(echo "$pvideo/$number").mov
+
+			else
+				ffmpeg -r 24 -i $gradedframes/$number/%d.png -vcodec prores $(echo "$pvideo/$number").mov
+
+		fi
+	# incriments the number variable so we can name video files something
+	# different, and find the folders in the directory (it is used for
+	# both the video file name, and to find the next directory in the 
+	# mixedframes folder
+	number=$(($number+1))
+
+	done

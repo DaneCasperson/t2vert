@@ -1,0 +1,13 @@
+# LuminanceHDR Tonemapping Setting file.
+# Editing this file by hand is risky, worst case scenario is Luminance crashing.
+# Please edit this file by hand only if you know what you're doing, in any case never change the left hand side text (i.e. the part before the ``='').
+TMOSETTINGSVERSION=0.6
+XSIZE=1952
+TMO=Mantiuk06
+CONTRASTFACTOR=0.6
+SATURATIONFACTOR=2
+DETAILFACTOR=1
+CONTRASTEQUALIZATION=NO
+PREGAMMA=1
+POSTSATURATION=1
+POSTGAMMA=1

@@ -1,0 +1,3 @@
+Dane - updated script to allow for user input on which frame they want to reference when designing color grades for a .mlv video
+
+updated script to allow the user to define the output frame rate in the configuration file (only valid for frame blended video, not optical flow video, might be a nice feature to add to optical flow video, see frame blended video subscript for samples of how this can be added to the optical flow script)

@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# gets global variables shared between multiple subscripts (settings
+# as it were
+source ./configuration-file
+
+#creates directory we will place our color graded images into
+mkdir $gradedframes
+
+newfolder=1
+
+for folder in $(ls -v -d $dumpedframes/*/)
+	do
+		# sets the number that luminance hdr will use to name
+		# the images it outputs
+		number=1
+
+
+		# creates directory we will dump the name frames
+		# into
+
+		mkdir $gradedframes/$newfolder
+			
+			for image in $(ls -v $folder | grep -i .dng | grep -v .xmp )
+				
+				do
+
+				# process images with luminance hdr (hard baked in right now is the mantiuk06 operator
+				# but we could make this an option later
+				
+				# collects tone mapping operater values from
+				# a settings file.  we store them in variables
+				# that we will use with luminance hdr in the 
+				# next couple of lines
+
+				settings=../$(ls ../ | grep -i .txt)
+
+				toneoperator=$(cat $settings | grep -i "TMO=" | sed -e s/.*=//g)
+				contrastfactor=$(cat $settings | grep -i contrastfactor | sed -e s/.*=//g)
+				saturationfactor=$(cat $settings | grep -i saturationfactor | sed -e s/.*=//g)
+				detailfactor=$(cat $settings | grep -i detailfactor | sed -e s/.*=//g)
+				contrastequalization=$(cat $settings | grep -i contrastequalization | sed -e s/.*=//g)
+				pregamma=$(cat $settings | grep -i pregamma | sed -e s/.*=//g)
+
+				luminance-hdr-cli --ev 0 --tmo $tonemapoperator --tmoM06Contrast 0.6 --tmoM06Saturation 2 --tmoM06Detail 1 --tmoM06ContrastEqual no -o $gradedframes/$newfolder/$number.png -q 100 $folder/$image
+		
+				# incriments number variable so that images get new names on export from luminance hdr
+				number=$(($number+1))
+				done
+
+
+		# copies audio files (if any) to the png image
+                # sequence folders
+
+                cp $folder/*.wav $gradedframes/$newfolder/
+
+	
+
+                # incriments the variable that defines where darktable
+                # and our audio copy script, place there files when there
+                # done with them.
+                
+		newfolder=$(($newfolder+1))
+
+
+	done
+
+	
