@@ -1,7 +1,7 @@
 # t2vert
 A utility to streamline color grading raw video files from the magic lantern project on linux (and maybe macosx?)
 
-right now I am mostly using a black magic design orignal pocket camera with this script. but I have left in the functionality
+right now I am mostly using a black magic design original pocket camera with this script. but I have left in the functionality
 to dump MLV files for those wanting to use this script with magic lantern.  
 
 I have stripped the optical flow video from the core script, as it was not up to date, and it was not something I was using anymore. if you still need it, or you need a script that can handle up the frame rate from 18 frames a second to 24 (as the original did) I have left the original script available, in a sub folder called, T2vert old.  people who are shooting on modern cameras at 24fps would be advised to avoid that folder, as that version of the script is a bit buggier then the current one.
