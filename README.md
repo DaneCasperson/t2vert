@@ -29,3 +29,5 @@ Optional dependencies
 
 Luminance-HDR-CLI
 it can be handy to have Luminance hdr installed as well.
+
+EXTRA NOTE: right now, the current branch is the fold called t2vert-master, it is highly advised you use the contents of that folder only. I will fix it so that we don't have programs within programs folder later, but I can't seem to figure it out on the web interface and I am too lazy to do it properly from the command line right now. 
