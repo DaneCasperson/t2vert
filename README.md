@@ -4,7 +4,7 @@ A utility to streamline color grading raw video files from the magic lantern pro
 right now I am mostly using a black magic design original pocket camera with this script. but I have left in the functionality
 to dump MLV files for those wanting to use this script with magic lantern.  
 
-I have stripped the optical flow video from the core script, as it was not up to date, and it was not something I was using anymore. if you still need it, or you need a script that can handle up the frame rate from 18 frames a second to 24 (as the original did) I have left the original script available, in a sub folder called, T2vert old.  people who are shooting on modern cameras at 24fps would be advised to avoid that folder, as that version of the script is a bit buggier then the current one.
+I have stripped the optical flow video from the core script, as it was not up to date, and it was not something I was using anymore. if you still need it, or you need a script that can handle upping the frame rate from 18 frames a second to 24 (as the original did) I have left the original script available, in a sub folder called, T2vert old.  people who are shooting on modern cameras at 24fps would be advised to avoid that folder, as that version of the script is a bit buggier then the current one.
 
 I built this originally to process raw video files shot using magic lantern and the canon t2i, it was an experiment to try
 and push the T2i to its limits and see if we could get usable footage off that camera in raw well aware of its limitations in
