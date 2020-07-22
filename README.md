@@ -13,3 +13,19 @@ on the T2i, and this script can still work well with the T2i for those looking t
 said, i have updated this script to work best with the canon 50D, 5D II and the black magic pocket camera (the original one)
 
 I also include some cool features to create hdr video, for those who like the idea.
+
+
+Current known dependencies
+
+
+you must have
+FFMPEG
+Dark Table CLI (I believe it is included with dark table in almost all distros)
+Dark Table
+
+it is possible you need more dependencies, but if your working from ubuntu you probably already have them installed
+
+Optional dependencies
+
+Luminance-HDR-CLI
+it can be handy to have Luminance hdr installed as well.
