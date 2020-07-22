@@ -27,7 +27,7 @@ it is possible you need more dependencies, but if your working from ubuntu you p
 
 Optional dependencies
 
-Luminance-HDR-CLI
-it can be handy to have Luminance hdr installed as well.
+Luminance-HDR-CLI (alternate option for color grading video.  more geeky, hard for the user, but pretty powerful.
+Zenity (for choosing which frame you want to preview when color grading with dark table) if zenity is not installed, you will preview frame 50 by default
 
 EXTRA NOTE: right now, the current branch is the fold called t2vert-master, it is highly advised you use the contents of that folder only. I will fix it so that we don't have programs within programs folder later, but I can't seem to figure it out on the web interface and I am too lazy to do it properly from the command line right now. 
